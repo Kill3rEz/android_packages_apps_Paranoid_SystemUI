@@ -16,14 +16,8 @@
 
 package co.aospa.systemui.qs.tileimpl
 
-import co.aospa.systemui.qs.tiles.AlwaysOnDisplayTile
-import co.aospa.systemui.qs.tiles.CaffeineTile
 import co.aospa.systemui.qs.tiles.DataSwitchTile
-import co.aospa.systemui.qs.tiles.DcDimmingTile
-import co.aospa.systemui.qs.tiles.HeadsUpTile
 import co.aospa.systemui.qs.tiles.PowerShareTile
-import co.aospa.systemui.qs.tiles.SoundTile
-import co.aospa.systemui.qs.tiles.UsbTetherTile
 
 import com.android.systemui.R
 import com.android.systemui.qs.QsEventLogger
@@ -39,20 +33,15 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import dagger.multibindings.StringKey
 
+// PenguinOS: the aod / caffeine / heads_up / nfc / sound / usb_tether tiles are
+// already provided by the base SystemUI (com.android.systemui.custom.CustomModule
+// and ConnectivityModule), and the fingerprint provider by BiometricsModule, so
+// binding them here too triggered Dagger duplicate map-key / duplicate-binding
+// errors. Only the tiles unique to ParanoidSystemUI are kept. DcDimmingTile was
+// dropped because android.hardware.display.DcDimmingManager is not present in this
+// frameworks/base fork.
 @Module
 interface ParanoidQSModule {
-
-    /** Inject AlwaysOnDisplayTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(AlwaysOnDisplayTile.TILE_SPEC)
-    fun bindAlwaysOnDisplayTile(alwaysOnDisplayTile: AlwaysOnDisplayTile): QSTileImpl<*>
-
-    /** Inject CaffeineTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(CaffeineTile.TILE_SPEC)
-    fun bindCaffeineTile(caffeineTile: CaffeineTile): QSTileImpl<*>
 
     /** Inject DataSwitchTile into tileMap in QSModule */
     @Binds
@@ -60,76 +49,15 @@ interface ParanoidQSModule {
     @StringKey(DataSwitchTile.TILE_SPEC)
     fun bindDataSwitchTile(dataSwitchTile: DataSwitchTile): QSTileImpl<*>
 
-    /** Inject DcDimmingTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(DcDimmingTile.TILE_SPEC)
-    fun bindDcDimmingTile(dcDimmingTile: DcDimmingTile): QSTileImpl<*>
-
-    /** Inject HeadsUpTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(HeadsUpTile.TILE_SPEC)
-    fun bindHeadsUpTile(headsUpTile: HeadsUpTile): QSTileImpl<*>
-
     /** Inject PowerShareTile into tileMap in QSModule */
     @Binds
     @IntoMap
     @StringKey(PowerShareTile.TILE_SPEC)
     fun bindPowerShareTile(powerShareTile: PowerShareTile): QSTileImpl<*>
 
-    /** Inject SoundTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(SoundTile.TILE_SPEC)
-    fun bindSoundTile(soundTile: SoundTile): QSTileImpl<*>
-
-    /** Inject UsbTetherTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(UsbTetherTile.TILE_SPEC)
-    fun bindUsbTetherTile(usbTetherTile: UsbTetherTile): QSTileImpl<*>
-
     companion object {
-        const val AOD_TILE_SPEC = "aod"
-        const val CAFFEINE_TILE_SPEC = "caffeine"
         const val DATASWITCH_TILE_SPEC = "dataswitch"
-        const val DCDIMMING_TILE_SPEC = "dc_dimming"
-        const val HEADS_UP_TILE_SPEC = "heads_up"
-        const val NFC_TILE_SPEC = "nfc"
         const val POWERSHARE_TILE_SPEC = "powershare"
-        const val SOUND_TILE_SPEC = "sound"
-        const val USB_TETHER_TILE_SPEC = "usb_tether"
-
-        @Provides
-        @IntoMap
-        @StringKey(AOD_TILE_SPEC)
-        fun provideAodTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(AOD_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_qs_aod,
-                        labelRes = R.string.quick_settings_aod_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.DISPLAY,
-            )
-
-        @Provides
-        @IntoMap
-        @StringKey(CAFFEINE_TILE_SPEC)
-        fun provideCaffeineTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(CAFFEINE_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_qs_caffeine,
-                        labelRes = R.string.quick_settings_caffeine_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.DISPLAY,
-            )
 
         @Provides
         @IntoMap
@@ -148,51 +76,6 @@ interface ParanoidQSModule {
 
         @Provides
         @IntoMap
-        @StringKey(DCDIMMING_TILE_SPEC)
-        fun provideDcDimmingTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(DCDIMMING_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_dc_dimming_tile,
-                        labelRes = R.string.quick_settings_dc_dimming_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.DISPLAY,
-            )
-
-        @Provides
-        @IntoMap
-        @StringKey(HEADS_UP_TILE_SPEC)
-        fun provideHeadsUpTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(HEADS_UP_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_qs_heads_up,
-                        labelRes = R.string.quick_settings_heads_up_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.ACCESSIBILITY,
-            )
-
-        @Provides
-        @IntoMap
-        @StringKey(NFC_TILE_SPEC)
-        fun provideNfcTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(NFC_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = com.android.systemui.res.R.drawable.ic_qs_nfc,
-                        labelRes = com.android.systemui.res.R.string.quick_settings_nfc_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.CONNECTIVITY,
-            )
-
-        @Provides
-        @IntoMap
         @StringKey(POWERSHARE_TILE_SPEC)
         fun providePowershareTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
             QSTileConfig(
@@ -204,36 +87,6 @@ interface ParanoidQSModule {
                     ),
                 instanceId = uiEventLogger.getNewInstanceId(),
                 category = TileCategory.UTILITIES,
-            )
-
-        @Provides
-        @IntoMap
-        @StringKey(SOUND_TILE_SPEC)
-        fun provideSoundTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(SOUND_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_qs_ringer_audible,
-                        labelRes = R.string.quick_settings_sound_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.UTILITIES,
-            )
-
-        @Provides
-        @IntoMap
-        @StringKey(USB_TETHER_TILE_SPEC)
-        fun provideUsbTetherTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
-            QSTileConfig(
-                tileSpec = TileSpec.create(USB_TETHER_TILE_SPEC),
-                uiConfig =
-                    QSTileUIConfig.Resource(
-                        iconRes = R.drawable.ic_qs_usb_tether,
-                        labelRes = R.string.quick_settings_usb_tether_label
-                    ),
-                instanceId = uiEventLogger.getNewInstanceId(),
-                category = TileCategory.CONNECTIVITY,
             )
     }
 }

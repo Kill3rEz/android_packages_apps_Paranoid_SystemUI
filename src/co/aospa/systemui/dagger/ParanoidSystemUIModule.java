@@ -32,7 +32,6 @@ import com.android.systemui.accessibility.SystemActionsModule;
 import com.android.systemui.accessibility.data.repository.AccessibilityRepositoryModule;
 import com.android.systemui.actioncorner.ActionCornerModule;
 import com.android.systemui.battery.BatterySaverModule;
-import com.android.systemui.biometrics.FingerprintInteractiveToAuthProvider;
 import com.android.systemui.clipboardoverlay.dagger.ClipboardOverlayOverrideModule;
 import com.android.systemui.communal.posturing.dagger.PosturingModule;
 import com.android.systemui.contextualcursor.ContextualCursorModule;
@@ -112,7 +111,6 @@ import com.android.systemui.util.kotlin.SysUICoroutinesModule;
 import com.android.systemui.volume.dagger.VolumeModule;
 import com.android.systemui.wallpapers.dagger.WallpaperModule;
 
-import co.aospa.systemui.biometrics.FingerprintInteractiveToAuthProviderImpl;
 import co.aospa.systemui.controls.AospaControlsTileResourceConfigurationImpl;
 import co.aospa.systemui.qs.tileimpl.ParanoidQSModule;
 
@@ -282,9 +280,9 @@ public abstract class ParanoidSystemUIModule {
     abstract ControlsTileResourceConfiguration bindControlsTileResourceConfiguration(
             AospaControlsTileResourceConfigurationImpl configuration);
 
-    @Binds
-    abstract FingerprintInteractiveToAuthProvider bindFingerprintInteractiveToAuthProviderImpl(
-            FingerprintInteractiveToAuthProviderImpl impl);
+    // PenguinOS: FingerprintInteractiveToAuthProvider is already bound by the base
+    // BiometricsModule (FingerprintInteractiveToAuthGoogleProviderImpl); binding it
+    // again here caused a Dagger duplicate-binding error. Use the base provider.
 
     /** */
     @Provides
